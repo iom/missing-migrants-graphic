@@ -1,0 +1,57 @@
+
+:root {
+    --font-family: "Open Sans", sans-serif;
+    --blue1: hsl(220, 100%, 30%); 
+    --blue2: hsl(220, 50%, 50%); 
+    --blue3: hsl(220, 50%, 66%); 
+    --blue4: hsl(220, 50%, 80%); 
+    --blue5: hsl(220, 50%, 90%); 
+    --green1: hsl(175, 100%, 30%);  
+    --green2: hsl(175, 50%, 50%); 
+    --green3: hsl(175, 50%, 66%); 
+    --green4: hsl(175, 50%, 80%);
+    --green5: hsl(175, 50%, 90%); 
+    --yellow: hsl(40, 80%, 60%); 
+    --red1: hsl(360, 70%, 50%); 
+    --red2: hsl(360, 60%, 60%); 
+    --red3: hsl(360, 60%, 75%); 
+    --red4: hsl(360, 60%, 85%); 
+    --red5: hsl(360, 60%, 90%); 
+    --unBlue1: hsl(210, 70%, 50%); 
+    --unBlue2: hsl(210, 70%, 66%); 
+    --unBlue3: hsl(210, 70%, 77%); 
+    --unBlue4: hsl(210, 70%, 88%); 
+    --unBlue5: hsl(210, 70%, 97%); 
+    --gray1: hsl(0, 0%, 30%); 
+    --gray2: hsl(0, 0%, 40%); 
+    --gray3: hsl(0, 0%, 60%); 
+    --gray4: hsl(0, 0%, 80%); 
+    --gray5: hsl(0, 0%, 95%); 
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 1rem;
+}
+
+.panel {
+    display: inline-block;
+    position: relative;
+    background-color: var(--unBlue5);
+}
+
+.inset {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
