@@ -1,2 +1,3 @@
-# missing-migrants-graphic
-Source codes for interactive Missing Migrants graphic
+# Missing Migrants Graphic
+
+Source codes for the [interactive Missing Migrants graphic](https://iom.github.io/missing-migrants-graphic/).
