@@ -54,7 +54,11 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    width: var(--width);
+    max-width: var(--width);
+
+    @media (max-width: 500px) {
+        gap: .8em;
+    }
 }
 
 /* Forms */
@@ -63,30 +67,49 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    background-color: var(--blue5);
+    padding: 1rem;
+    border-radius: 5px;
+
+    @media (max-width: 500px) {
+        padding: .8rem;
+    }
 }
 
 .forms > * {
     display: flex;
     flex-direction: row;
     gap: 1rem;
+
+    @media (max-width: 500px) {
+        flex-direction: column;
+        gap: .5rem;
+    }
 }
 
 .form-label {
     width: 7rem;
+    font-weight: bold;
+    color: var(--blue1);
 }
 
 .options {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    column-gap: 1rem;
+    column-gap: .8rem;
     row-gap: .5rem;
+
+    @media (max-width: 500px) {
+        column-gap: .5rem;
+        row-gap: .1rem;
+    }
 }
 
 .option {
     display: flex;
     flex-direction: row;
-    gap: .5rem;
+    gap: .3rem;
 }
 
 /* Panel */
@@ -96,9 +119,34 @@ body {
     background-color: var(--unBlue5);
 }
 
+.svg-panel {
+    width: 100%;
+    height: auto;
+}
+
 .inset {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+/* Map styling */
+
+.globe {
+    fill: var(--unBlue4);
+    stroke: none;
+    stroke-width: 0px;
+}
+
+.graticule {
+    fill: none;
+    stroke: var(--unBlue5);
+    stroke-width: .5px;
+}
+
+.border {
+    fill: var(--gray5);
+    stroke: var(--unBlue4);
+    stroke-width: 1px;
 }
 

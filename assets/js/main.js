@@ -1,8 +1,12 @@
 import * as forms from "./forms.js";
 
+// Forms
+
 forms.addFormYears(2014, 2024);
 forms.addFormCause();
 forms.addFormRegion();
+
+// Render chart
 
 Promise.all([
     
@@ -35,7 +39,6 @@ Promise.all([
     drawGlobe(map, disputedBlack, disputedWhite, data); 
 });
 
-
 function drawGlobe(map, disputedBlack, disputedWhite, data) {
 
     const params = {
@@ -47,8 +50,37 @@ function drawGlobe(map, disputedBlack, disputedWhite, data) {
 
     const svg = container.append("svg")
         .attr("class", "svg-panel")
-        .attr("width", params.width)
-        .attr("height", params.height)
-        .attr("viewBox", [0, 0, params.width, params.height])
+        .attr("viewBox", [0, 0, params.width, params.height]);
+
+    let projection = d3.geoOrthographic()
+        .scale(300)
+        .center([0, 0])
+        .rotate(0, -10)
+        .translate([params.width / 2, params.height / 2]);
+
+    let path = d3.geoPath().projection(projection);
+
+    const graticule = d3.geoGraticule();
+
+    let currentScale = projection.scale();
+    let rotate = projection.rotate();
+
+    let globe = svg.append("circle")
+        .attr("class", "globe")
+        .attr("cx", params.width / 2)
+        .attr("cy", params.height / 2)
+        .attr("r", projection.scale());
+
+    let graticules = svg.append("path")
+        .datum(graticule())
+        .attr("class", "graticule")
+        .attr("d", path)
+
+    let country = svg.selectAll("country")
+        .data(map)
+        .enter().append("path")
+        .attr("class", "border")
+        .attr("d", path)
+
 
 };
