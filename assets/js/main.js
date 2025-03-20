@@ -1,3 +1,8 @@
+import * as forms from "./forms.js";
+
+forms.addFormYears(2014, 2024);
+forms.addFormCause();
+forms.addFormRegion();
 
 Promise.all([
     
