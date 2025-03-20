@@ -13,7 +13,8 @@ export function addFormYears(start, end) {
         options.call(addOption, t);
     };
         
-    options.call(addOption, "All years");
+    options.call(addOption, "All years")
+    d3.select(".form-year input[value='All years']").attr("checked", true)
         
     function addOption(form, value) {
         
