@@ -1,3 +1,5 @@
+import * as util from "./util.js";
+
 export function addFormYears(start, end) {
 
     const form = d3.select(".form-year");
@@ -33,15 +35,6 @@ export function addFormYears(start, end) {
 
 export function addFormCause() {
 
-    const causes = [
-        "All causes",
-        "Drowning",
-        "Sickness, accidents and harsh conditions",
-        "Transport hazards",
-        "Violence",
-        "Mixed or unknown",
-    ];
-
     const form = d3.select(".form-cause");
 
     form.append("label")
@@ -50,7 +43,7 @@ export function addFormCause() {
 
     form.append("select")
         .selectAll("option")
-        .data(causes)
+        .data(util.causes)
         .join("option")
         .attr("value", d => d)
         .text(d => d);

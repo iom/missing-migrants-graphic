@@ -1,4 +1,7 @@
 import * as forms from "./forms.js";
+import * as util from "./util.js";
+import { zoompanel } from "./zoompanel.js";
+import { spike } from "./spike.js";
 
 // Forms
 
@@ -20,33 +23,42 @@ Promise.all([
     const map = topojson.feature(mapRaw, mapRaw.objects.countries).features;
 
     const disputedBlack = topojson.feature(
-            disputedBlackRaw, 
-            disputedBlackRaw.objects.disputed_dotted_black
-        ).features;
+        disputedBlackRaw, 
+        disputedBlackRaw.objects.disputed_dotted_black
+    ).features;
 
     const disputedWhite = topojson.feature(
-            disputedWhiteRaw, 
-            disputedWhiteRaw.objects.disputed_dotted_white
-        ).features;
+        disputedWhiteRaw, 
+        disputedWhiteRaw.objects.disputed_dotted_white
+    ).features;
 
     const data = dataRaw.map(d => ({ 
         year: d.year,
         cause: d.cause, 
         n: +d.n, 
         coordinates: [d.lon, d.lat] 
-      }));
+    }));
 
     drawGlobe(map, disputedBlack, disputedWhite, data); 
 });
 
-function drawGlobe(map, disputedBlack, disputedWhite, data) {
+function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
 
     const params = {
         width: 900,
-        height: 700
+        height: 700,
+        maxcount: d3.max(dataAll, d => d.n),
+        sensitivity: 75
     };
 
-    const container = d3.select(".panel")
+    let rotationOn = false;
+
+
+    d3.selectAll(".form-year input").on("input", update);
+    d3.select(".form-cause select").on("input", update);
+    // d3.select(".form-region select").on("input", focus);
+
+    const container = d3.select(".panel");
 
     const svg = container.append("svg")
         .attr("class", "svg-panel")
@@ -55,7 +67,7 @@ function drawGlobe(map, disputedBlack, disputedWhite, data) {
     let projection = d3.geoOrthographic()
         .scale(300)
         .center([0, 0])
-        .rotate(0, -10)
+        .rotate([0, -10])
         .translate([params.width / 2, params.height / 2]);
 
     let path = d3.geoPath().projection(projection);
@@ -74,13 +86,168 @@ function drawGlobe(map, disputedBlack, disputedWhite, data) {
     let graticules = svg.append("path")
         .datum(graticule())
         .attr("class", "graticule")
-        .attr("d", path)
+        .attr("d", path);
 
     let country = svg.selectAll("country")
         .data(map)
         .enter().append("path")
         .attr("class", "border")
-        .attr("d", path)
+        .attr("d", path);
+
+    // Spikes
+
+    const color = d3.scaleOrdinal()
+        .domain(util.causes.slice(1))
+        .range([
+            util.color.blue, 
+            util.color.yellow, 
+            util.color.green, 
+            util.color.red, 
+            util.color.gray
+        ]);
+
+    const spikeheight = d3.scaleLinear()
+        .domain([1, params.maxcount])
+        .range([1, 200]);
+
+    const spikewidth = d => 2 * Math.pow(1.3, Math.log2(d / 300));
+
+    const spikes = svg.append("g");
+
+    // Pan and zoom
+  
+    const drag = d3.drag().on("drag", dragged);
+    const zoom = d3.zoom().scaleExtent([1, 10]).on("zoom", zoomed);
+
+    svg.call(drag);
+    svg.call(zoom);
+
+    // Control panel
+
+    const controlPanel = svg.append("g")
+        .attr("transform", `translate(${ params.width - 100 }, ${ 10 })`)
+        .call(zoompanel, 60, 0);
+
+    controlPanel.select("#buttonplus")
+        .on("click", () => {
+            rotationOn = false;
+            svg.transition().duration(300).call(zoom.scaleBy, 1.5);
+            updateSpinButton();
+        });
+    
+    controlPanel.select("#buttonminus")
+        .on("click", () => {
+            rotationOn = false;
+            svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5);
+            updateSpinButton();
+        });
+
+    controlPanel.select("#buttonreset")
+        .on("click", () => {
+            rotationOn = false;
+            svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+            updateSpinButton();
+        });
+
+    const spinButton = controlPanel.append("g")
+        .attr("class", "spin-button")
+        .attr("transform", "translate(0, 5)");
+
+    spinButton.append("rect")
+        .attr("x", 0).attr("y", 0)
+        .attr("height", 20)
+        .attr("width", 50)
+        .attr("ry", 2);
+        
+    const spinText = spinButton.append("text")
+        .attr("x", 50 / 2).attr("y", 14)
+        .attr("text-anchor", "middle")
+        .text("Spin");
+    
+    spinButton.append("rect")
+        .attr("x", 0).attr("y", 0)
+        .attr("height", 20)
+        .attr("width", 50)
+        .attr("opacity", 0)
+        .style("cursor", d => "pointer")
+        .on("click", () => {
+            rotationOn = !rotationOn;
+            updateSpinButton();
+        });
+
+    update();
+
+    // Functions
+
+    function dragged(event) {
+
+        rotationOn = false;
+        updateSpinButton();
+        
+        rotate = projection.rotate();
+        const scale = projection.scale();
+        const k = params.sensitivity / projection.scale();
+        
+        projection.rotate([rotate[0] + event.dx * k, rotate[1] - event.dy * k]);
+        path = d3.geoPath().projection(projection);
+        
+        svg.selectAll("path.border").attr("d", path);
+        svg.selectAll("path.graticule").attr("d", path);
+        update();
+    };
+      
+    function zoomed(event) {
+
+        rotationOn = false;
+        updateSpinButton();
+        
+        projection.scale(currentScale * event.transform.k);
+        const newScale = projection.scale();
+        path = d3.geoPath().projection(projection);
+        
+        svg.selectAll("path.border").attr("d", path);
+        svg.selectAll("path.graticule").attr("d", path);
+        globe.attr("r", newScale);
+        update();
+    };
+
+    function updateSpinButton() {
+        d3.select(".spin-button text").text(rotationOn ? "Pause" : "Spin");
+    };
+
+    function update() {
+
+        let year = d3.select(".form-year input:checked").property("value");
+        let cause = d3.select(".form-cause select").property("value");
+        
+        let data = dataAll.filter(d => d.n > 10);
+        if (year != "All years") { data = data.filter(d => d.year == year) };
+        if (cause != "All causes") { data = data.filter(d => d.cause == cause) };
+        if (year == "All years" && cause == "All causes") { 
+            data = data.filter(d => d.n > 10) 
+        };
+        
+        spikes.selectAll(".spike").remove();
+        spikes.selectAll(".spike")
+            .data(data)
+            .join("polyline")
+            .attr("class", "spike")
+            .attr("fill", d => color(d.cause))
+            .classed("hide", d => !path({ type: "Point", coordinates: d.coordinates }))
+            .attr("points", d => {
+                const p = projection(d.coordinates);
+                const a = geometric.lineAngle([[params.width / 2, params.height / 2], p]);
+                return spike()
+                    .x(p[0]).y(p[1])
+                    .angle(a)
+                    .width(spikewidth(projection.scale()))
+                    .height(spikeheight(d.n))();
+            });
+    };
+    
+
+
+
 
 
 };

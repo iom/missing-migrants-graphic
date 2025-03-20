@@ -150,3 +150,54 @@ body {
     stroke-width: 1px;
 }
 
+/* Control panel */
+
+.zoom-panel, .spin-button {
+    stroke: var(--gray3);
+    stroke-opacity: .3;
+}
+
+.zoom-panel rect, .spin-button rect {
+    fill: white;
+    fill-opacity: .8;
+    stroke-width: .5;
+}
+
+.zoom-panel line {
+    stroke-width: 1;
+    stroke-dasharray: 2;
+}
+
+#plus, #minus, #reset{
+    fill-opacity: .3;
+}
+
+#buttonplus, #buttonminus, #buttonreset {
+    cursor: pointer
+}
+
+#buttonplus:hover ~ #plus, 
+#buttonminus:hover ~ #minus, 
+#buttonreset:hover ~ #reset {
+    fill-opacity: .8;
+}
+
+.spin-button text {
+    fill: var(--gray2);
+    text-transform: uppercase;
+}
+
+/* Spikes */
+
+.spike {
+    fill-opacity: 0.75;
+    transition: opacity 350ms;
+}
+
+.spike.fast-fade {
+    transition: opacity 150ms;
+}
+
+.spike.hide {
+    opacity: 0;
+}
