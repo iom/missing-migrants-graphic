@@ -53,10 +53,9 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
 
     let rotationOn = false;
 
-
     d3.selectAll(".form-year input").on("input", update);
     d3.select(".form-cause select").on("input", update);
-    // d3.select(".form-region select").on("input", focus);
+    d3.select(".form-region select").on("input", focus);
 
     const container = d3.select(".panel");
 
@@ -177,7 +176,58 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
 
     update();
 
+    // Spin
+    
+    const revolutionDuration = 30000;
+    let t1, dt, steps, xPos, yPos, t0, oldPos;
+    t0 = 0;
+    oldPos = 0;
+    
+    d3.timer((elapsed) => {
+        
+        if (rotationOn) {
+        
+            t1 = elapsed;
+            steps = (t0 - elapsed) * 360 / revolutionDuration;
+            xPos = rotate[0] - steps
+            if (xPos <= -180) {xPos = xPos + 360};
+
+            const scale = projection.scale();
+            projection.rotate(rotate);
+            
+            svg.selectAll("path.border").attr("d", path);    
+            svg.selectAll("path.graticule").attr("d", path);
+
+            update();
+            
+            t0 = t1;
+            rotate[0] = xPos;
+
+        } else t0 = elapsed;
+    });
+
     // Functions
+
+    function focus() {        
+        region = d3.select(".form-region select")
+            .property("value").split(",").map(Number);
+
+        d3.transition()
+        .duration(1000)
+        .tween("rotate", () => {
+            let r = d3.interpolate(projection.rotate(), region.slice(0, 2));
+            return t => {
+                projection.rotate(r(t));
+                
+                path.projection(projection);
+                globe.attr("r", projection.scale());
+                svg.selectAll("path.border").attr("d", path);
+                svg.selectAll("path.graticule").attr("d", path);
+
+                update();
+            }})
+        .on("end", () => rotate = projection.rotate());
+    };
 
     function dragged(event) {
 
