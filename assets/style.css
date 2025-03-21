@@ -43,6 +43,10 @@
     font: inherit;
 }
 
+strong {
+    font-weight: 700;
+}
+
 h1 {
     margin: 1rem 0;
 }
@@ -149,6 +153,21 @@ body {
     stroke-width: 1px;
 }
 
+.border.disputed {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-dasharray: 3px;
+}
+
+.border.disputed.disputed-black {
+    stroke: var(--unBlue4);
+}
+
+.border.disputed.disputed-white {
+    stroke: var(--gray5);
+    stroke-width: 5px;
+}
+
 /* Control panel */
 
 .control-panel {
@@ -231,6 +250,11 @@ body {
     gap: .3rem;
 }
 
+.legend-text {
+    color: var(--blue1);
+    opacity: .9;
+}
+
 .legend-key {
     display: flex;
 }
@@ -239,12 +263,6 @@ body {
     width: 10px;
     height: 10px;
     margin: auto;
-}
-
-.legend-text {
-    display: flex;
-    color: var(--blue1);
-    opacity: .9;
 }
 
 .legend-spike {
@@ -262,12 +280,11 @@ body {
     }
 }
 
-.legend-spike-text {
-    justify-self:end;
+.legend-spike .legend-text {
+    justify-self: end;
 }
 
 .legend-spike-key {
     display: flex;
     align-items: center;
 }
-

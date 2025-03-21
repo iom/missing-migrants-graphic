@@ -64,6 +64,8 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
         .attr("class", "svg-panel")
         .attr("viewBox", [0, 0, params.width, params.height]);
 
+    // Map
+
     let projection = d3.geoOrthographic()
         .scale(300)
         .center([0, 0])
@@ -83,18 +85,28 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
         .attr("cy", params.height / 2)
         .attr("r", projection.scale());
 
-    let graticules = svg.append("path")
+    svg.append("path")
         .datum(graticule())
         .attr("class", "graticule")
         .attr("d", path);
 
-    let country = svg.selectAll("country")
+    svg.selectAll("country")
         .data(map)
         .enter().append("path")
         .attr("class", "border")
         .attr("d", path);
 
-    // Spikes
+    svg.selectAll("disputed-black")
+        .data(disputedBlack)
+        .join("path")
+        .attr("class", "border disputed disputed-black")
+        .attr("d", path);
+      
+    svg.selectAll("disputed-white")
+        .data(disputedWhite)
+        .join("path")
+        .attr("class", "border disputed disputed-white")
+        .attr("d", path);
 
     const spikes = svg.append("g");
 
@@ -102,7 +114,6 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
   
     const drag = d3.drag().on("drag", dragged);
     const zoom = d3.zoom().scaleExtent([1, 10]).on("zoom", zoomed);
-
     svg.call(drag);
     svg.call(zoom);
 

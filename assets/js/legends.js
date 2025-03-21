@@ -42,7 +42,7 @@ function addSpikeItem(i, value) {
     legendSpike.append("div")
         .attr("class", "legend-text")
         .style("bottom", -util.spikeheight(value))
-        .text(value + " dead")
+        .html("<strong>" + value + "</strong>" + " dead")
     
     const spikeItemContainer = legendSpike.append("div")
         .attr("class", "legend-spike-key")
