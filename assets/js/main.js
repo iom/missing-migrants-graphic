@@ -1,5 +1,6 @@
 import * as forms from "./forms.js";
 import * as util from "./util.js";
+import "./legends.js";
 import { zoompanel } from "./zoompanel.js";
 import { spike } from "./spike.js";
 
@@ -95,22 +96,6 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
 
     // Spikes
 
-    const color = d3.scaleOrdinal()
-        .domain(util.causes.slice(1))
-        .range([
-            util.color.blue, 
-            util.color.yellow, 
-            util.color.green, 
-            util.color.red, 
-            util.color.gray
-        ]);
-
-    const spikeheight = d3.scaleLinear()
-        .domain([1, params.maxcount])
-        .range([1, 200]);
-
-    const spikewidth = d => 2 * Math.pow(1.3, Math.log2(d / 300));
-
     const spikes = svg.append("g");
 
     // Pan and zoom
@@ -123,34 +108,41 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
 
     // Control panel
 
-    const controlPanel = svg.append("g")
-        .attr("transform", `translate(${ params.width - 100 }, ${ 10 })`)
-        .call(zoompanel, 60, 0);
+    const controlPanel = d3.select(".control-panel")
+    
+    const controlPanelSVG = controlPanel.append("svg")
+        .attr("width", 90)
+        .attr("height", 75);
 
-    controlPanel.select("#buttonplus")
+    controlPanelSVG.append("g")
+        .attr("class", "zoom-panel")
+        .attr("transform", "translate(60,1)")
+        .call(zoompanel);
+
+    controlPanelSVG.select("#buttonplus")
         .on("click", () => {
             rotationOn = false;
             svg.transition().duration(300).call(zoom.scaleBy, 1.5);
             updateSpinButton();
         });
     
-    controlPanel.select("#buttonminus")
+    controlPanelSVG.select("#buttonminus")
         .on("click", () => {
             rotationOn = false;
             svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5);
             updateSpinButton();
         });
 
-    controlPanel.select("#buttonreset")
+    controlPanelSVG.select("#buttonreset")
         .on("click", () => {
             rotationOn = false;
             svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
             updateSpinButton();
         });
 
-    const spinButton = controlPanel.append("g")
+    const spinButton = controlPanelSVG.append("g")
         .attr("class", "spin-button")
-        .attr("transform", "translate(0, 5)");
+        .attr("transform", "translate(0,5)")
 
     spinButton.append("rect")
         .attr("x", 0).attr("y", 0)
@@ -163,12 +155,16 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
         .attr("text-anchor", "middle")
         .text("Spin");
     
-    spinButton.append("rect")
+    controlPanelSVG.append("g")
+        .append("rect")
+        .attr("transform", "translate(0,5)")
         .attr("x", 0).attr("y", 0)
         .attr("height", 20)
         .attr("width", 50)
         .attr("opacity", 0)
         .style("cursor", d => "pointer")
+        .on("mouseover", () => spinText.style("fill-opacity", .8))
+        .on("mouseleave", () => spinText.style("fill-opacity", .3))
         .on("click", () => {
             rotationOn = !rotationOn;
             updateSpinButton();
@@ -208,25 +204,24 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
 
     // Functions
 
-    function focus() {        
-        region = d3.select(".form-region select")
+    function focus() {
+
+        let region = d3.select(".form-region select")
             .property("value").split(",").map(Number);
 
         d3.transition()
-        .duration(1000)
-        .tween("rotate", () => {
-            let r = d3.interpolate(projection.rotate(), region.slice(0, 2));
-            return t => {
-                projection.rotate(r(t));
-                
-                path.projection(projection);
-                globe.attr("r", projection.scale());
-                svg.selectAll("path.border").attr("d", path);
-                svg.selectAll("path.graticule").attr("d", path);
-
-                update();
-            }})
-        .on("end", () => rotate = projection.rotate());
+            .duration(1000)
+            .tween("rotate", () => {
+                let r = d3.interpolate(projection.rotate(), region.slice(0, 2));
+                return t => {
+                    projection.rotate(r(t));
+                    path.projection(projection);
+                    globe.attr("r", projection.scale());
+                    svg.selectAll("path.border").attr("d", path);
+                    svg.selectAll("path.graticule").attr("d", path);
+                    update();
+                }})
+            .on("end", () => rotate = projection.rotate());
     };
 
     function dragged(event) {
@@ -282,7 +277,7 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
             .data(data)
             .join("polyline")
             .attr("class", "spike")
-            .attr("fill", d => color(d.cause))
+            .attr("fill", d => util.color(d.cause))
             .classed("hide", d => !path({ type: "Point", coordinates: d.coordinates }))
             .attr("points", d => {
                 const p = projection(d.coordinates);
@@ -290,14 +285,12 @@ function drawGlobe(map, disputedBlack, disputedWhite, dataAll) {
                 return spike()
                     .x(p[0]).y(p[1])
                     .angle(a)
-                    .width(spikewidth(projection.scale()))
-                    .height(spikeheight(d.n))();
+                    .width(util.spikewidth(projection.scale()))
+                    .height(util.spikeheight(d.n))();
             });
     };
-    
-
-
-
-
-
 };
+
+// Legends
+
+// legends.call(addLegendColors);

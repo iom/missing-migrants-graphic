@@ -51,15 +51,6 @@ export function addFormCause() {
 
 export function addFormRegion() {
 
-    const regions = new Map([
-        ["Select...", [0, -10, 300]],
-        ["Africa", [-15, -10, 600]],
-        ["Americas", [90, -20, 600]], 
-        ["Asia", [-100, -20, 600]], 
-        ["Mediterranean", [-21, -36, 600]],
-        ["Middle East", [-45, -25, 600]], 
-      ]);
-
     const form = d3.select(".form-region");
 
     form.append("label")
@@ -68,8 +59,8 @@ export function addFormRegion() {
 
     form.append("select")
         .selectAll("option")
-        .data(regions)
+        .data(util.regions)
         .join("option")
         .attr("value", d => d[1])
         .text(d => d[0]);    
-}
+};

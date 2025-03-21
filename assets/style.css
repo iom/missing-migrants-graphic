@@ -1,5 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800");
 
+/* Resets */
+
 :root {
     --font-family: "Open Sans", sans-serif;
     --width: 900px;
@@ -38,6 +40,7 @@
 * {
     margin: 0;
     padding: 0;
+    font: inherit;
 }
 
 h1 {
@@ -47,6 +50,8 @@ h1 {
 body {
     font-family: var(--font-family);
     font-size: .8rem;
+    font-size: 0.6rem;
+    font-size: clamp(0.6rem, 0.4rem + 0.67vw, 0.8rem);
     margin: 1rem;
 }
 
@@ -124,12 +129,6 @@ body {
     height: auto;
 }
 
-.inset {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
 /* Map styling */
 
 .globe {
@@ -152,19 +151,29 @@ body {
 
 /* Control panel */
 
-.zoom-panel, .spin-button {
-    stroke: var(--gray3);
-    stroke-opacity: .3;
+.control-panel {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+
+    @media (max-width: 500px) {
+        top: .25rem;
+        right: .2rem;
+    }
 }
 
 .zoom-panel rect, .spin-button rect {
     fill: white;
     fill-opacity: .8;
+    stroke: var(--gray3);
     stroke-width: .5;
+    stroke-opacity: .3;
 }
 
 .zoom-panel line {
+    stroke: var(--gray3);
     stroke-width: 1;
+    stroke-opacity: .3;
     stroke-dasharray: 2;
 }
 
@@ -172,19 +181,19 @@ body {
     fill-opacity: .3;
 }
 
-#buttonplus, #buttonminus, #buttonreset {
+.zoom-btn {
     cursor: pointer
 }
 
-#buttonplus:hover ~ #plus, 
-#buttonminus:hover ~ #minus, 
-#buttonreset:hover ~ #reset {
-    fill-opacity: .8;
+.spin-button text {
+    fill: black;
+    fill-opacity: .3;
+    text-transform: uppercase;
 }
 
-.spin-button text {
-    fill: var(--gray2);
-    text-transform: uppercase;
+.spin-button:hover text {
+    opacity: .8;
+    transition: opacity .1s ease-in;
 }
 
 /* Spikes */
@@ -201,3 +210,64 @@ body {
 .spike.hide {
     opacity: 0;
 }
+
+/* Legends */
+
+.legend-color {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 500px) {
+        top: .4rem;
+        left: .5rem;
+    }
+}
+
+.legend-item {
+    display: flex;
+    gap: .3rem;
+}
+
+.legend-key {
+    display: flex;
+}
+
+.legend-key-fill {
+    width: 10px;
+    height: 10px;
+    margin: auto;
+}
+
+.legend-text {
+    display: flex;
+    color: var(--blue1);
+    opacity: .9;
+}
+
+.legend-spike {
+    position: absolute;
+    bottom: .75rem;
+    left: .75rem;
+
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: .25rem;
+
+    @media (max-width: 500px) {
+        bottom: .4rem;
+        left: .5rem;
+    }
+}
+
+.legend-spike-text {
+    justify-self:end;
+}
+
+.legend-spike-key {
+    display: flex;
+    align-items: center;
+}
+
